@@ -2,6 +2,7 @@ package com.hishabee.kotlin_test.ui.util
 
 class Constants {
     companion object {
-        const val LAST_CACHED_TIME = "last_cached_time"
+        const val TODO_DONE_STATUS = "0"
+        const val TODO_PENDING_STATUS = "1"
     }
 }

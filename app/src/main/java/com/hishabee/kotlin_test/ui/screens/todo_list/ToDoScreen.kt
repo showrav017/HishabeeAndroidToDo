@@ -22,31 +22,11 @@ import kotlinx.coroutines.delay
 @Composable
 fun ToDoScreen(navigator: DestinationsNavigator) {
     val viewModel: ToDoViewModel = hiltViewModel()
-    var startAnimation by remember { mutableStateOf(false) }
-    val animationTimeout = 3000
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf<Boolean>(false) }
 
     LaunchedEffect(key1 = true) {
-        startAnimation = true
-        delay(animationTimeout.toLong())
-
-        viewModel.uiState.collect {
-            when (it) {
-                is UIState.Loading -> {}
-                is UIState.DataLoaded -> {
-
-                }
-
-                is UIState.Error -> {
-                    context.showToast(it.message)
-                }
-
-                else -> {
-
-                }
-            }
-        }
+        viewModel.getList()
     }
 
     BaseComponent(
@@ -58,14 +38,14 @@ fun ToDoScreen(navigator: DestinationsNavigator) {
         dialogContent= {
             TodoInputDialog(cancleTapped = {showDialog = false}){
                 showDialog = false
-                println(it)
+                viewModel.createNewToDo(it)
             }
         }
     ) {
         Column(Modifier.fillMaxWidth()) {
             TopBar()
             Box(Modifier.fillMaxHeight(1f)) {
-                Body{
+                Body(viewModel){
                     showDialog = true
                 }
             }

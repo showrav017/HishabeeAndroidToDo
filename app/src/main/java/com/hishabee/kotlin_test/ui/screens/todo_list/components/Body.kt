@@ -3,6 +3,7 @@ package com.hishabee.kotlin_test.ui.screens.todo_list.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,12 +46,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hishabee.kotlin_test.R
+import com.hishabee.kotlin_test.db.entity.Todo
+import com.hishabee.kotlin_test.ui.screens.todo_list.ToDoViewModel
+import com.hishabee.kotlin_test.ui.util.Constants.Companion.TODO_DONE_STATUS
+import com.hishabee.kotlin_test.ui.util.Constants.Companion.TODO_PENDING_STATUS
 
 @Composable
-fun Body(showNewToDoInputDialog: () -> Unit) {
+fun Body(viewModel: ToDoViewModel, showNewToDoInputDialog: () -> Unit) {
     Box(
         modifier = Modifier
-            .fillMaxSize())
+            .fillMaxSize()
+    )
     {
         LazyColumn(
             modifier = Modifier
@@ -61,10 +67,11 @@ fun Body(showNewToDoInputDialog: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(6.dp),
         )
         {
-            itemsIndexed(listOf("", "","", "","", "","", "","", "","", "","", "","", "","", "","",
-                "","", "","", "","", "","", "","", "","", "","", "","", "","", "","", "","", ""
-            )) { index, content ->
-                Item()
+            itemsIndexed(viewModel.todoList) { index, content ->
+                Item(content)
+                {
+                    viewModel.setItemDone(it.id)
+                }
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -76,7 +83,7 @@ fun Body(showNewToDoInputDialog: () -> Unit) {
                     .padding(vertical = 30.dp),
                 onClick = {
                     showNewToDoInputDialog()
-                          },
+                },
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.light_blue)),
                 contentPadding = ButtonDefaults.ContentPadding
             ) {
@@ -90,29 +97,29 @@ fun Body(showNewToDoInputDialog: () -> Unit) {
     }
 }
 
-@Preview
 @Composable
-fun Item()
-{
+fun Item(item: Todo, setItemDone:((item: Todo) -> Unit)) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(5.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
     ) {
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(5.dp))
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(5.dp)
+        )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Item",
+                item.todo_title ?: "",
                 modifier = Modifier
                     .weight(1f)
                     .padding(0.dp)
                     .padding(10.dp),
                 style = MaterialTheme.typography.titleMedium
                     .copy(
-                        textDecoration = TextDecoration.LineThrough,
+                        textDecoration = if (item.status == TODO_PENDING_STATUS) TextDecoration.None else TextDecoration.LineThrough,
                         color = MaterialTheme.colorScheme.primary
                     )
             )
@@ -121,13 +128,20 @@ fun Item()
                 imageVector = Icons.Filled.Done,
                 tint = colorResource(id = R.color.white),
                 contentDescription = "",
-                modifier = Modifier.background(colorResource(id = R.color.light_teal), RoundedCornerShape(20.dp))
+                modifier = Modifier.background(
+                    colorResource(id = if (item.status == TODO_DONE_STATUS) R.color.light_teal else R.color.offwhite),
+                    RoundedCornerShape(20.dp)
+                ).clickable {
+                    if (item.status == TODO_PENDING_STATUS) setItemDone(item)
+                }
             )
             Spacer(modifier = Modifier.width(12.dp))
         }
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(5.dp))
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(5.dp)
+        )
     }
 }
 

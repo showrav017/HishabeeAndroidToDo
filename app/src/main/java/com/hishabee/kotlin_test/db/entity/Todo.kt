@@ -11,5 +11,11 @@ data class Todo(
     val id: Int = 0,
 
     @ColumnInfo(name = "todo_title")
-    var base_url: String? = null,
+    var todo_title: String? = null,
+
+    @ColumnInfo(name = "created_at")
+    var created_at: String? = null,
+
+    @ColumnInfo(name = "status")
+    var status: String? = null,
 )

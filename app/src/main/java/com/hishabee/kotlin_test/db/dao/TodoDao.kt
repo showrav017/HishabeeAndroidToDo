@@ -9,12 +9,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDao {
-    @Query("SELECT * FROM Todo ORDER BY id DESC LIMIT 1")
-    fun getLatestConfig(): Flow<Todo>
 
-    @Query("SELECT CASE WHEN EXISTS(SELECT 1 FROM Todo) THEN 1 ELSE 0 END")
-    fun isEmptyConfig(): Flow<Boolean>
+    @Query("SELECT * FROM Todo ORDER BY status DESC, created_at DESC")
+    fun getList(): Flow<List<Todo>>
+
+    @Query("UPDATE Todo SET status = '0' WHERE id = :id")
+    fun updateStatus(
+        id: Int
+    )
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(imagesConfig: Todo)
+    suspend fun insert(todoInfo: Todo)
 }
