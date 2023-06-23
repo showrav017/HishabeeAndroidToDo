@@ -1,4 +1,4 @@
-package com.hishabee.kotlin_test.ui.screens.splash
+package com.hishabee.kotlin_test.ui.screens.todo_list
 
 
 import androidx.lifecycle.*
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SplashViewModel @Inject constructor(
+class ToDoViewModel @Inject constructor(
     var preferencesHelper: PreferencesHelper,
     var todoRepository: ITodoRepository
 ) : BaseViewModel() {

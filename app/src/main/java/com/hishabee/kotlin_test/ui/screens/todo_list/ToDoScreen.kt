@@ -1,0 +1,74 @@
+package com.hishabee.kotlin_test.ui.screens.todo_list
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.hishabee.kotlin_test.ui.base.BaseComponent
+import com.hishabee.kotlin_test.ui.base.UIState
+import com.hishabee.kotlin_test.ui.screens.todo_list.components.*
+import com.hishabee.kotlin_test.ui.util.showToast
+import kotlinx.coroutines.delay
+
+@RootNavGraph(start = true)
+@Destination
+@Composable
+fun ToDoScreen(navigator: DestinationsNavigator) {
+    val viewModel: ToDoViewModel = hiltViewModel()
+    var startAnimation by remember { mutableStateOf(false) }
+    val animationTimeout = 3000
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf<Boolean>(false) }
+
+    LaunchedEffect(key1 = true) {
+        startAnimation = true
+        delay(animationTimeout.toLong())
+
+        viewModel.uiState.collect {
+            when (it) {
+                is UIState.Loading -> {}
+                is UIState.DataLoaded -> {
+
+                }
+
+                is UIState.Error -> {
+                    context.showToast(it.message)
+                }
+
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    BaseComponent(
+        progressBarState = viewModel.showProgressBar.collectAsState(),
+        unauthorizedState = viewModel.unauthorized.collectAsState(),
+        progressBarContent = {},
+        showDialog = showDialog,
+        unAuthorizedContent = {},
+        dialogContent= {
+            TodoInputDialog(cancleTapped = {showDialog = false}){
+                showDialog = false
+                println(it)
+            }
+        }
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            TopBar()
+            Box(Modifier.fillMaxHeight(1f)) {
+                Body{
+                    showDialog = true
+                }
+            }
+        }
+    }
+}
